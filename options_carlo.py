@@ -26,7 +26,7 @@
 import numpy as np
 
 
-class Configuration:
+class Config:
     # stores configuration parameters
     def __init__(self, num_scenarios, num_steps):
         self.num_scenarios = num_scenarios
@@ -46,15 +46,15 @@ class TradeOption:
 class GBM:
     # Geometric Brownian Motion Simulator
     # Class will contain the GBM diffeq, it will take in trades and generate simulated stock prices
-    def __init__(self, Configuration):
-        self.Configuration = Configuration
+    def __init__(self, Config):
+        self.Config = Config
 
     #simulate risk factors using GBM stochastic diffeq
     def simulation_of_risk_factors(self, trade):
         prices = []
         # European option only concerns 1 time_step
         time_step = 1
-        for simulation_num in range(self.Configuration.num_scenarios):
+        for simulation_num in range(self.Config.num_scenarios):
             random_norm_num = np.random.normal(0, 1)
             drift = trade.risk_free_rate - 0.5*(trade.volatility**2)*time_step
             uncertainty = trade.volatility*np.sqrt(time_step)*random_norm_num
@@ -85,8 +85,8 @@ class MC_Simulator:
     # passes simulated risk factors to the payoff pricer to value the trade
 
     # instantiate with configuration and model
-    def __init__(self, configuration, model):
-        self.configuration = configuration
+    def __init__(self, config, model):
+        self.config = config
         self.model = model
 
     # similate the trade and give the price
@@ -94,3 +94,30 @@ class MC_Simulator:
         prices_per_simulation = self.model.simulation_of_risk_factors(trade)
         price = trade_pricer.get_price(trade, prices_per_simulation)
         return price
+
+
+def plot_scenarios(prices_per_simulation):
+    x = []
+    y = []
+    for i in prices_per_simulation:
+        y.append(i)
+        y.append(trade.stock_price)
+        x.append(1)
+        x.append(0)
+        plt.plot(x, y)
+    plt.ylabel("Stock Value")
+    plt.xlabel("Step")
+    plt.show()
+
+
+
+# pricing option with black scholes with characteristics:
+    # S = 200, K = 200, T = 1 year, Volatility = 10%, Risk-Free Rate = 15%
+def Main():
+    config = Config(10000, 1) #1000 scenarios & steps
+    trade = TradeOption(200, 200, 0.15, 0.1, 1)
+    model = GBM(Config)
+    tradePricer = Option_Payoff_Pricing()
+    simulator = MC_Simulator(config, model)
+    price = simulator.Simulation(trade, tradePricer)
+    print(price)
