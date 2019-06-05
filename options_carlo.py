@@ -46,8 +46,8 @@ class TradeOption:
 class GBM:
     # Geometric Brownian Motion Simulator
     # Class will contain the GBM diffeq, it will take in trades and generate simulated stock prices
-    def __init__(self, Config):
-        self.Config = Config
+    def __init__(self, config):
+        self.config = config
 
     #simulate risk factors using GBM stochastic diffeq
     def simulation_of_risk_factors(self, trade):
@@ -116,7 +116,7 @@ def plot_scenarios(prices_per_simulation):
 def Main():
     config = Config(10000, 1) #1000 scenarios & steps
     trade = TradeOption(200, 200, 0.15, 0.1, 1)
-    model = GBM(Config)
+    model = GBM(config)
     tradePricer = Option_Payoff_Pricing()
     simulator = MC_Simulator(config, model)
     price = simulator.Simulation(trade, tradePricer)
