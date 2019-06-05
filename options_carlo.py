@@ -89,9 +89,13 @@ class MC_Simulator:
         self.config = config
         self.model = model
 
+    def perSimulation(self, trade):
+        prices_per_simulation = self.model.simulation_of_risk_factors(trade)
+        return prices_per_simulation
+
     # similate the trade and give the price
     def Simulation(self, trade, trade_pricer):
-        prices_per_simulation = self.model.simulation_of_risk_factors(trade)
+        prices_per_simulation = self.perSimulation(trade)
         price = trade_pricer.get_price(trade, prices_per_simulation)
         return price
 
@@ -114,10 +118,13 @@ def plot_scenarios(prices_per_simulation):
 # pricing option with black scholes with characteristics:
     # S = 200, K = 200, T = 1 year, Volatility = 10%, Risk-Free Rate = 15%
 def Main():
-    config = Config(10000, 1) #1000 scenarios & steps
+    config = Config(100, 1) #100 scenarios & steps
     trade = TradeOption(200, 200, 0.15, 0.1, 1)
     model = GBM(config)
     tradePricer = Option_Payoff_Pricing()
     simulator = MC_Simulator(config, model)
     price = simulator.Simulation(trade, tradePricer)
     print(price)
+    plot_scenarios(simulator.perSimulation(trade))
+
+Main()
